@@ -1,2 +1,2 @@
 # qtYam
-Qt interface to Yamaha receivers, in python.
+Qt interface to Yamaha receivers, coded in Python.
