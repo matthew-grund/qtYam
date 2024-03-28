@@ -46,6 +46,7 @@ class YamahaAmp():
     def get_net_radio_favorites(self):
         if not self.got_radio_faves:
             url = self.base_url + "netusb/getListInfo?input=net_radio"
+            
 
     def get_network_status(self):
         if not self.got_net_status:
