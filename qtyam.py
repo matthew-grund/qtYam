@@ -11,7 +11,9 @@ import PySide6.QtWebEngineCore as qtweb
 import styles.qt_style_sheet as qt_style_sheet
 import widgets.qt_central_widget as qt_central_widget
 import widgets.qt_left_toolbar as qt_left_toolbar
+import widgets.qt_bottom_toolbar as qt_bottom_toolbar
 import core.yamaha as yam
+
 
 class QtYam(qtw.QMainWindow):
 
@@ -25,7 +27,7 @@ class QtYam(qtw.QMainWindow):
         self.screen = self.app.primaryScreen()
         self.screen_size =  self.screen.size()
         self.setWindowTitle(self.title)
-        self.resize(int(self.screen_size.width()*0.70),int(self.screen_size.height()*0.45))
+        self.resize(int(self.screen_size.width()*0.55),int(self.screen_size.height()*0.35))
         self.app.setStyleSheet(qt_style_sheet.qss)
         self.frame_style = qtw.QFrame.Shape.Panel  # .Panel for designing, .NoFrame for a clean look    
         self.setWindowFlags(qtc.Qt.FramelessWindowHint)
@@ -36,8 +38,11 @@ class QtYam(qtw.QMainWindow):
         qt_central_widget.configure(self)
         qt_central_widget.setup(self)
         #left toolbar has icons
-        self.left_toolbar = qt_left_toolbar.QTLeftToolBar(self)    
-        self.statusBar().showMessage("                        " + self.description + "  version " + self.version_str + "    " + self.copyright_str, 3000)
+        self.left_toolbar = qt_left_toolbar.QTLeftToolBar(self) 
+        # bottom toolbar has icons 
+        self.bottom_toolbar = qt_bottom_toolbar.QTBottomToolBar(self)
+
+        self.statusBar().showMessage("                          " + self.description + "  version " + self.version_str + "    " + self.copyright_str, 3000)
         # sync with the current amp status
         self.show_status()
         
@@ -66,6 +71,9 @@ class QtYam(qtw.QMainWindow):
             units_str = ys['actual_volume']['unit']
             self.left_toolbar.show_actual_volume(actual_volume,units_str)
 
+        if 'input_text' in ys:
+            self.bottom_toolbar.show_input(ys['input_text'])
+
         # timer to sync with other conterollers - remotes, spotify, etc. (needed?)
         self.status_timer = qtc.QTimer()
         self.status_timer.timeout.connect(self.show_status)
@@ -86,6 +94,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()   
-
-
-

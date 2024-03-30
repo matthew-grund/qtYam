@@ -1,7 +1,7 @@
 #
-#  ROS Home Qt UI
+#  Yamaha app
 #
-# Copyright 2022 Matthew Grund
+# Copyright 2024 Matthew Grund
 #
 # Licensed under the BSD 2 Clause license;
 # you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class QTLeftToolBar(qtw.QToolBar):
         self.raw_volume_increment = 1
         self.icon_path = "./icons/"
         q_main_window.addToolBar(qtc.Qt.LeftToolBarArea,self)
-        self.current_active_button_group = "map"
-        self.current_active_button_item = "view"
+        self.current_active_button_group = "amp"
+        self.current_active_button_item = "playback"
         self.active_button_color = "#e8904d"
         self.normal_button_color = "#777770"
         self.on_button_color = "#e8904d"
@@ -35,30 +35,26 @@ class QTLeftToolBar(qtw.QToolBar):
         self.current_actual_volume = 0
         self.current_raw_volume = 73
         self.volume_units_str = "counts"
-        self.add_app_logo("Yamaha-Logo.png")
 
+
+        # toolbar elements
+        self.add_app_logo("Yamaha-Logo.png")
         # layout the buttons in the toolbar    
-        self.add_toolbar_spacer()
         self.add_normal_toolbar_button("power","toggle","power_settings_new_96.png")
-        self.add_toolbar_spacer()
+        # self.add_toolbar_spacer()
         self.add_volume_display()
         self.add_normal_toolbar_button("volume","up","volume_up_96.png")
         self.add_normal_toolbar_button("volume","down","volume_down_96.png")
-        self.add_normal_toolbar_button("volume","mute","volume_off_96.png")
-        # self.add_normal_toolbar_button("playback","forward","list_alt_96.png")
-        # self.add_normal_toolbar_button("playback","back","list_alt_96.png")    
+        self.add_normal_toolbar_button("volume","mute","volume_off_96.png") 
         self.add_toolbar_spacer()
-        self.add_normal_toolbar_button("amp","media","queue_music_96.png")
-        self.add_normal_toolbar_button("amp","sound","equalizer_96.png")        
-        # self.add_normal_toolbar_button("help","getting_started","help_outline_96.png")
-        # self.add_normal_toolbar_button("help","about","info_96.png")
-        # self.add_toolbar_spacer()
-        # self.add_normal_toolbar_button("map","config","settings_96.png")
+        self.add_normal_toolbar_button("amp","sound","equalizer_96.png")   
         self.power_is_on = False
+        
         
     def add_toolbar_spacer(self):
         spacer = yamstyle.styled_spacer(self.q_main_window)
         self.addWidget(spacer)
+
 
     def add_app_logo(self, filename):
         self.app_label = yamstyle.styled_label(self.q_main_window,"YAMAHA",18)
@@ -71,6 +67,7 @@ class QTLeftToolBar(qtw.QToolBar):
         pixmap = pixmap.scaledToWidth(48,qtg.Qt.TransformationMode.SmoothTransformation)
         self.app_label.setPixmap(pixmap)
         self.addWidget(self.app_label)
+
 
     def add_normal_toolbar_button(self,group_name,item_name,icon_file):
         i = self.normal_icon(self.icon_path + icon_file)
@@ -111,6 +108,7 @@ class QTLeftToolBar(qtw.QToolBar):
     def active_icon(self,filename):
         return self.color_icon(filename,self.active_button_color)
     
+
     def normal_icon(self,filename):
         return self.color_icon(filename,self.normal_button_color)
 
@@ -120,12 +118,12 @@ class QTLeftToolBar(qtw.QToolBar):
             self.control_callback(group_name, item_name) 
         else:
             self.select_button(group_name, item_name)
-            self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 7000)
+            self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 3000)
             self.q_main_window.stacked_layout.setCurrentIndex(self.q_main_window.stacked_frame_indices[group_name][item_name]) 
 
 
     def control_callback(self, group_name, item_name):    
-        self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " clicked", 3000)
+        self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " clicked", 1000)
         if group_name == "power" and item_name == "toggle":
             if self.power_is_on:
                 self.q_main_window.yam.set_power(False)

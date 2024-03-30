@@ -20,11 +20,13 @@ def configure(qt_main_window):
     qt_main_window.stacked_frame_dict["amp"] = []
     qt_main_window.stacked_frame_dict["amp"].append("media")
     qt_main_window.stacked_frame_dict["amp"].append("sound")
+    qt_main_window.stacked_frame_dict["amp"].append("playback")
     qt_main_window.stacked_frame_dict["amp"].append("setup")
     # devices
     qt_main_window.stacked_frame_dict["yamaha"] = []
-    qt_main_window.stacked_frame_dict["yamaha"].append("discover")
-    qt_main_window.stacked_frame_dict["yamaha"].append("known")    
+    qt_main_window.stacked_frame_dict["yamaha"].append("known")
+    qt_main_window.stacked_frame_dict["yamaha"].append("configure") 
+    qt_main_window.stacked_frame_dict["yamaha"].append("discover")    
     # help
     qt_main_window.stacked_frame_dict["help"] = []        
     qt_main_window.stacked_frame_dict["help"].append("about")

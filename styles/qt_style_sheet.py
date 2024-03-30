@@ -32,10 +32,10 @@ QMenuBar {
 }
 QToolBar {
     background-color: #212121 ;
-    border: 1px solid black ;
+    border: 1px solid #212121 ;
 }
 QToolButton {
     background-color: #212121 ;
-    border: 1px solid black ;
+    border: 1px solid #212121 ;
 }
 '''
