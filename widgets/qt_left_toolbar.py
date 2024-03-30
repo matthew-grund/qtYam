@@ -23,27 +23,31 @@ class QTLeftToolBar(qtw.QToolBar):
         self.setIconSize(qtc.QSize(32,32))
         self.setMinimumWidth(96)
         self.setMovable(False)
+        self.raw_volume_increment = 1
         self.icon_path = "./icons/"
         q_main_window.addToolBar(qtc.Qt.LeftToolBarArea,self)
         self.current_active_button_group = "map"
         self.current_active_button_item = "view"
-        self.active_button_color = "#ffb75b"
-        self.normal_button_color = "#373333"
-        self.on_button_color = "#ebc636"
+        self.active_button_color = "#e8904d"
+        self.normal_button_color = "#777770"
+        self.on_button_color = "#e8904d"
         self.action_dict = {}
-
+        self.current_actual_volume = 0
+        self.current_raw_volume = 73
+        self.volume_units_str = "counts"
         self.add_app_logo("Yamaha-Logo.png")
 
         # layout the buttons in the toolbar    
-        # self.add_toolbar_spacer()
+        self.add_toolbar_spacer()
         self.add_normal_toolbar_button("power","toggle","power_settings_new_96.png")
         self.add_toolbar_spacer()
+        self.add_volume_display()
         self.add_normal_toolbar_button("volume","up","volume_up_96.png")
         self.add_normal_toolbar_button("volume","down","volume_down_96.png")
         self.add_normal_toolbar_button("volume","mute","volume_off_96.png")
         # self.add_normal_toolbar_button("playback","forward","list_alt_96.png")
         # self.add_normal_toolbar_button("playback","back","list_alt_96.png")    
-        # self.add_toolbar_spacer()
+        self.add_toolbar_spacer()
         self.add_normal_toolbar_button("amp","media","queue_music_96.png")
         self.add_normal_toolbar_button("amp","sound","equalizer_96.png")        
         # self.add_normal_toolbar_button("help","getting_started","help_outline_96.png")
@@ -76,6 +80,11 @@ class QTLeftToolBar(qtw.QToolBar):
         if group_name not in self.action_dict:
             self.action_dict[group_name] = {}
         self.action_dict[group_name][item_name] = a  
+
+
+    def add_volume_display(self):
+        self.volume_display = yamstyle.styled_label(self.q_main_window,"volume",14)
+        self.addWidget(self.volume_display)
 
 
     def add_active_toolbar_button(self,group_name,item_name,icon_file):
@@ -111,11 +120,12 @@ class QTLeftToolBar(qtw.QToolBar):
             self.control_callback(group_name, item_name) 
         else:
             self.select_button(group_name, item_name)
-            self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected")
+            self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 7000)
             self.q_main_window.stacked_layout.setCurrentIndex(self.q_main_window.stacked_frame_indices[group_name][item_name]) 
 
+
     def control_callback(self, group_name, item_name):    
-        self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " clicked")
+        self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " clicked", 3000)
         if group_name == "power" and item_name == "toggle":
             if self.power_is_on:
                 self.q_main_window.yam.set_power(False)
@@ -123,6 +133,27 @@ class QTLeftToolBar(qtw.QToolBar):
             else:
                 self.q_main_window.yam.set_power(True)
                 self.show_power(True)
+
+        if group_name == "volume" and item_name == "mute":
+            if self.volume_is_muted:
+                self.q_main_window.yam.set_mute(False)
+                self.show_mute(False)
+            else:
+                self.q_main_window.yam.set_mute(True)
+                self.show_mute(True)
+
+        if group_name == "volume" and item_name == "up":
+                inc = self.raw_volume_increment
+                self.q_main_window.yam.increment_volume(inc)
+                self.show_raw_volume(self.current_raw_volume + inc)
+                self.show_actual_volume(self.current_actual_volume + 0.5 * inc, self.volume_units_str)
+
+        if group_name == "volume" and item_name == "down":
+                inc = -1 * self.raw_volume_increment
+                self.q_main_window.yam.increment_volume(inc)
+                self.show_raw_volume(self.current_raw_volume + inc)
+                self.show_actual_volume(self.current_actual_volume + 0.5 * inc,self.volume_units_str)
+
 
     def select_button(self, group_name, item_name):
         self.colorize_button(self.current_active_button_group, self.current_active_button_item, self.normal_button_color)
@@ -150,5 +181,42 @@ class QTLeftToolBar(qtw.QToolBar):
         self.power_is_on = is_on 
         if is_on:
             self.colorize_button("power", "toggle", self.on_button_color)
+            self.show_mute(False)
         else:    
             self.colorize_button("power", "toggle", self.normal_button_color) 
+            self.colorize_button("volume","up", self.normal_button_color)
+            self.colorize_button("volume","down", self.normal_button_color)
+            self.colorize_button("volume","mute", self.normal_button_color)
+            self.toolbar_callback("help","about")
+            self.volume_display.setText("- off -")
+
+
+    def show_mute(self,is_muted: bool):
+        self.volume_is_muted = is_muted
+        if not self.power_is_on:
+            return
+        if is_muted:
+            self.volume_display.setText("- mute -")
+            self.colorize_button("volume","up", self.normal_button_color)
+            self.colorize_button("volume","down", self.normal_button_color)
+            self.colorize_button("volume","mute", self.on_button_color)
+        else:
+            self.show_actual_volume(self.current_actual_volume, self.volume_units_str)
+            self.colorize_button("volume","up", self.on_button_color)
+            self.colorize_button("volume","down", self.on_button_color)
+            self.colorize_button("volume","mute", self.normal_button_color)
+
+
+    def show_raw_volume(self,raw_volume: int):
+        self.current_raw_volume = raw_volume
+        # self.q_main_window.statusBar().showMessage(f"raw volume is {raw_volume}",300)
+    
+
+    def show_actual_volume(self, actual_volume: float, units_str):
+        if not self.power_is_on:
+            return
+        self.current_actual_volume = actual_volume
+        self.volume_units_str = units_str
+        vol_str = str(actual_volume) + " " + units_str
+        if not self.volume_is_muted:
+            self.volume_display.setText(vol_str)    

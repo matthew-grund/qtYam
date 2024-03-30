@@ -1,5 +1,6 @@
 import os
 import sys
+import threading
 
 import PySide6.QtWidgets as qtw
 import PySide6.QtCore as qtc
@@ -36,12 +37,13 @@ class QtYam(qtw.QMainWindow):
         qt_central_widget.setup(self)
         #left toolbar has icons
         self.left_toolbar = qt_left_toolbar.QTLeftToolBar(self)    
-        self.statusBar().showMessage(self.description + "  version " + self.version + "    " + self.copyright_str)
-        self.init_status()
-
+        self.statusBar().showMessage("                        " + self.description + "  version " + self.version_str + "    " + self.copyright_str, 3000)
+        # sync with the current amp status
+        self.show_status()
+        
 
     # init ui from amp statup  
-    def init_status(self):
+    def show_status(self):
         ys = self.yam.get_status()
         print(ys)
         if 'power' in ys:
@@ -49,6 +51,25 @@ class QtYam(qtw.QMainWindow):
                 self.left_toolbar.show_power(True)
             else:
                 self.left_toolbar.show_power(False)    
+        if 'mute' in ys:
+            if ys['mute']:
+                self.left_toolbar.show_mute(True)  
+            else:
+                self.left_toolbar.show_mute(False)
+
+        if 'volume' in ys:
+            raw_volume = ys['volume']
+            self.left_toolbar.show_raw_volume(raw_volume)   
+
+        if 'actual_volume' in ys:
+            actual_volume = ys['actual_volume']['value']
+            units_str = ys['actual_volume']['unit']
+            self.left_toolbar.show_actual_volume(actual_volume,units_str)
+
+        # timer to sync with other conterollers - remotes, spotify, etc. (needed?)
+        self.status_timer = qtc.QTimer()
+        self.status_timer.timeout.connect(self.show_status)
+        self.status_timer.start(500)  
 
 
 ################################################

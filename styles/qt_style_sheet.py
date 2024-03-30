@@ -24,7 +24,7 @@ QWidget {
 }
 QStatusBar { 
     background-color: #212121 ; 
-    color: #ebc636 ;
+    color: #e8904d ;
 }
 QMenuBar {
     background-color: black ; 
