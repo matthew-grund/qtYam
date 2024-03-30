@@ -175,6 +175,7 @@ class QTLeftToolBar(qtw.QToolBar):
             icon = qtg.QIcon(pixy)
             a.setIcon(icon)
 
+
     def show_power(self, is_on: bool):
         self.power_is_on = is_on 
         if is_on:

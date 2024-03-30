@@ -12,6 +12,7 @@ import styles.qt_style_sheet as qt_style_sheet
 import widgets.qt_central_widget as qt_central_widget
 import widgets.qt_left_toolbar as qt_left_toolbar
 import widgets.qt_bottom_toolbar as qt_bottom_toolbar
+import widgets.qt_right_toolbar as qt_right_toolbar
 import core.yamaha as yam
 
 
@@ -37,10 +38,12 @@ class QtYam(qtw.QMainWindow):
         # central widget is a stack of frames
         qt_central_widget.configure(self)
         qt_central_widget.setup(self)
-        #left toolbar has icons
+        # left toolbar has icon and buttons
         self.left_toolbar = qt_left_toolbar.QTLeftToolBar(self) 
-        # bottom toolbar has icons 
+        # bottom toolbar has buttons and text
         self.bottom_toolbar = qt_bottom_toolbar.QTBottomToolBar(self)
+        # right toolbar has buttons and text
+        self.right_toolbar = qt_right_toolbar.QTRightToolBar(self)
 
         self.statusBar().showMessage("                          " + self.description + "  version " + self.version_str + "    " + self.copyright_str, 3000)
         # sync with the current amp status
