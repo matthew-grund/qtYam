@@ -23,11 +23,19 @@ QWidget {
     padding: 8px 8px ;  
 }
 QStatusBar { 
-    background-color: black ; 
-    color: white ;
+    background-color: #212121 ; 
+    color: #ebc636 ;
 }
 QMenuBar {
     background-color: black ; 
     color: white ;
+}
+QToolBar {
+    background-color: #212121 ;
+    border: 1px solid black ;
+}
+QToolButton {
+    background-color: #212121 ;
+    border: 1px solid black ;
 }
 '''
