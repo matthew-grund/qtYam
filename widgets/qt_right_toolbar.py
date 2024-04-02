@@ -11,6 +11,7 @@ import PySide6.QtCore as qtc
 import PySide6.QtGui as qtg
 
 import widgets.styled as yamstyle
+import core.yamaha as yam
 
 class QTRightToolBar(qtw.QToolBar):
 
@@ -18,41 +19,47 @@ class QTRightToolBar(qtw.QToolBar):
         super().__init__(q_main_window)
         self.q_main_window = q_main_window
         self.setStyleSheet(self.q_main_window.styleSheet())
-        self.setIconSize(qtc.QSize(32,32))
+        self.setIconSize(qtc.QSize(48,48))
         self.setMinimumWidth(96)
         self.setMovable(False)
         self.icon_path = "./icons/"
         q_main_window.addToolBar(qtc.Qt.RightToolBarArea,self)
         self.current_active_button_group = "amp"
-        self.current_active_button_item = "playback"
-        self.active_button_color = "white"
+        self.current_active_button_item = "yam-00"
+        self.active_button_color = "#e8904d"
         self.normal_button_color = "#777770"
+        self.unit_name_list = ["alpha", "beta", "gamma", "delta"]
         self.action_dict = {}
         self.playback_is_paused = False
-
+        self.unit_list = []
         # layout the buttons in the toolbar    
-        self.add_toolbar_spacer() 
-        self.add_toolbar_spacer()     
-        self.add_normal_toolbar_button("amp","media","queue_music_96.png")
-        self.add_input_display()
-        self.add_toolbar_spacer()
-        self.add_toolbar_spacer()        
-        self.add_normal_toolbar_button("playback","previous","skip_previous_96.png")
-        self.add_toolbar_spacer()
-        self.add_active_toolbar_button("playback","play","play_circle_96.png")
-        self.add_toolbar_spacer()
-        self.add_normal_toolbar_button("playback","next","skip_next_96.png")
-        self.add_toolbar_spacer()
-        self.add_toolbar_spacer()
-        self.add_toolbar_spacer()
-        self.add_normal_toolbar_button("help","getting_started","help_outline_96.png")
-        self.add_normal_toolbar_button("help","about","info_96.png")
-        # self.add_normal_toolbar_button("playback","forward","list_alt_96.png")
-        # self.add_normal_toolbar_button("playback","back","list_alt_96.png")    
-        # self.add_normal_toolbar_button("help","getting_started","help_outline_96.png")
-        # self.add_normal_toolbar_button("help","about","info_96.png")
-        # self.add_toolbar_spacer()
-        # self.add_normal_toolbar_button("map","config","settings_96.png")
+
+        # self.add_toolbar_spacer() 
+        for unit in range(len(self.q_main_window.yam_ip_list)):
+            item_name = f"unit-{unit:02d}"
+            unit_d = {}
+            unit_d['item'] = item_name
+            unit_d['ip'] = self.q_main_window.yam_ip_list[unit]
+            self.add_normal_toolbar_button("amp",item_name,"audio_video_receiver_48.png")
+            unit_d['handle'] = yam.YamahaAmp(self.q_main_window.yam_ip_list[unit])
+            unit_d['info'] = i = unit_d['handle'].get_info()
+            unit_d['model_name'] = mn = i['model_name']
+            unit_d['network_status'] = ns = unit_d['handle'].get_network_status()
+            unit_d['network_name'] = nn = ns['network_name']
+            unit_d['label'] = l = yamstyle.styled_label(self.q_main_window,nn,12)
+            self.addWidget(l)
+            self.unit_list.append(unit_d)
+            print(f"Added Yamaha {mn} ({nn}).")
+            # self.add_toolbar_spacer()
+        # layout the buttons in the toolbar    
+        self.add_unit_display() 
+        self.select_button("amp","unit-00")
+
+
+    def select_unit(self,unit:int):
+        self.unit_display.setText(self.unit_list[unit]['model_name'].upper())
+        self.q_main_window.yam = self.unit_list[unit]['handle']
+        self.q_main_window.reset_frame()
 
 
     def add_toolbar_spacer(self):
@@ -60,13 +67,16 @@ class QTRightToolBar(qtw.QToolBar):
         self.addWidget(spacer)
 
 
-    def add_input_display(self):
-        self.input_display = yamstyle.styled_label(self.q_main_window,"Input",18)
-        self.input_display.setFixedWidth(128)
-        self.addWidget(self.input_display)
+    def add_unit_display(self):
+        self.unit_display = yamstyle.styled_label(self.q_main_window,"Unit 1",18)
+        self.unit_display.setAlignment(qtc.Qt.AlignmentFlag.AlignCenter | qtc.Qt.AlignmentFlag.AlignVCenter)
+        self.unit_display.setObjectName("UNIT")
+        # self.unit_display.setFixedWidth(88)
+        self.addWidget(self.unit_display)
     
 
     def add_normal_toolbar_button(self,group_name,item_name,icon_file):
+        print(f"Adding '{group_name}'::'{item_name}'")
         i = self.normal_icon(self.icon_path + icon_file)
         a = qtg.QAction(i, item_name.title(), self)
         a.triggered.connect(lambda : self.toolbar_callback(group_name,item_name))
@@ -122,31 +132,20 @@ class QTRightToolBar(qtw.QToolBar):
 
     
     def toolbar_callback(self, group_name, item_name): 
-        if group_name == 'playback':
-            self.control_callback(group_name, item_name) 
-        else:
-            self.select_button(group_name, item_name)
+            self.select_button(group_name, item_name)            
             self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 3000)
-            self.q_main_window.stacked_layout.setCurrentIndex(self.q_main_window.stacked_frame_indices[group_name][item_name]) 
-
-
-    def control_callback(self, group_name, item_name):
-        if group_name == "playback" and item_name == "play":
-                self.q_main_window.yam.set_play(self.playback_is_paused)
-                self.playback_is_paused = not self.playback_is_paused
-                self.show_paused(self.playback_is_paused)
-        if group_name == "playback" and item_name == "next":    
-                self.q_main_window.yam.set_skip(True)   
-        if group_name == "playback" and item_name == "previous":    
-                self.q_main_window.yam.set_skip(False)    
-
+            if group_name != "amp":
+                self.q_main_window.stacked_layout.setCurrentIndex(self.q_main_window.stacked_frame_indices[group_name][item_name]) 
+                self.q_main_window.reset_frame_timer()
 
     def select_button(self, group_name, item_name):
         self.colorize_button(self.current_active_button_group, self.current_active_button_item, self.normal_button_color)
         self.colorize_button(group_name,item_name,self.active_button_color)
         self.current_active_button_group = group_name
         self.current_active_button_item = item_name  
-
+        str_list = item_name.split('-') 
+        unit = int(str_list[1])
+        self.select_unit(unit)
 
     def show_input(self, input: str):
         self.input_display.setText(input)

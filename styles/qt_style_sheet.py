@@ -9,10 +9,21 @@
 
 qss = \
 '''
-QWidget { 
-    background-color: #23262A ; 
-    color: white ;
+QLabel { 
+    background-color: black ; 
+    color: #e8904d ;
 }
+
+QLabel#YAMAHA {
+    background-color: #212121 ; 
+    color: #212121 ;
+}
+
+QLabel#UNIT {
+    background-color: #212121 ; 
+    color: #e8904d ;
+}
+
 #menu_clock {
     background-color: black ; 
     color: white ;

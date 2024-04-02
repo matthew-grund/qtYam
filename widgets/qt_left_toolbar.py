@@ -64,8 +64,9 @@ class QTLeftToolBar(qtw.QToolBar):
         painter.setCompositionMode(qtg.QPainter.CompositionMode_SourceIn)
         painter.fillRect(pixmap.rect(), qtg.QColor("white"))
         painter.end()
-        pixmap = pixmap.scaledToWidth(48,qtg.Qt.TransformationMode.SmoothTransformation)
+        pixmap = pixmap.scaledToWidth(64,qtg.Qt.TransformationMode.SmoothTransformation)
         self.app_label.setPixmap(pixmap)
+        self.app_label.setObjectName("YAMAHA")
         self.addWidget(self.app_label)
 
 
