@@ -1,6 +1,7 @@
 import os
 import sys
 import threading
+import urllib
 
 import PySide6.QtWidgets as qtw
 import PySide6.QtCore as qtc
@@ -24,6 +25,7 @@ class QtYam(qtw.QMainWindow):
         self.title = "Yamaha Receiver"
         self.description = "Yamaha Receiver Interface"
         self.version_str = "0.7.3" 
+
         self.copyright_str = "(c) copyright 2024, Matthew Grund"
         self.screen = self.app.primaryScreen()
         self.screen_size =  self.screen.size()
@@ -34,16 +36,20 @@ class QtYam(qtw.QMainWindow):
         self.frame_style = qtw.QFrame.Shape.Panel  # .Panel for designing, .NoFrame for a clean look    
         self.setWindowFlags(qtc.Qt.FramelessWindowHint)
         self.yam_ip_list = ['10.0.0.187', '10.0.0.216', '10.0.0.76']
-        # self.yam_ip_list = ['10.0.0.187']
+        # self.yam_ip_list = ['10.0.0.187
+        self.frame_timer_duration_ms = 3000
         self.yam = None
+        self.last_art_url = ''
         self.click_global_pos = None
         # central widget is a stack of frames
         qt_central_widget.configure(self)
         qt_central_widget.setup(self)
 
         self.statusBar().showMessage("                          " + self.description + "  version " + self.version_str + "    " + self.copyright_str, 3000)
+        
         # sync with the current amp status
         self.show_status()
+        self.show_playback()
 
         # timer to reset the main panel to 
         self.frame_timer = qtc.QTimer()
@@ -58,26 +64,40 @@ class QtYam(qtw.QMainWindow):
         self.right_toolbar = qt_right_toolbar.QTRightToolBar(self)
 
 
+    def set_central_frame(self,group_name, item_name):
+        self.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 3000)
+        self.stacked_layout.setCurrentIndex(self.stacked_frame_indices[group_name][item_name]) 
+        if group_name != "amp" or item_name != "playback":
+            self.start_frame_timer()
+        else:    
+            self.cancel_frame_timer()
+
+
     def reset_frame(self):
         self.left_toolbar.toolbar_callback("amp","playback")
+        self.bottom_toolbar.toolbar_callback("amp","playback")
+        self.cancel_frame_timer()
+
+
+    def cancel_frame_timer(self):
         if self.frame_timer:
             self.frame_timer.stop()
             self.frame_timer = None
 
 
-    def reset_frame_timer(self):
+    def start_frame_timer(self):
         if self.frame_timer:
             self.frame_timer.stop()
         self.frame_timer = qtc.QTimer()
         self.frame_timer.timeout.connect(self.reset_frame)
-        self.frame_timer.start(3000)  
+        self.frame_timer.start(self.frame_timer_duration_ms)  
 
 
     # init ui from amp statup  
     def show_status(self):
         if self.yam:
             ys = self.yam.get_status()
-            print(ys)
+            # print(ys)
             if 'power' in ys:
                 if ys['power'] == 'on':
                     self.left_toolbar.show_power(True)
@@ -105,6 +125,54 @@ class QtYam(qtw.QMainWindow):
         self.status_timer = qtc.QTimer()
         self.status_timer.timeout.connect(self.show_status)
         self.status_timer.start(500)  
+
+
+    def show_playback(self):
+        if self.yam:
+            yp = self.yam.get_now_playing()
+            print(yp)
+            if 'artist' in yp and 'album' in yp and 'track' in yp:
+                song = yp['track']
+                album = yp['album']
+                artist = yp['artist']
+                self.update_song_album_artist(song,album,artist)
+
+            if 'albumart_url' in yp:
+                url = yp['albumart_url']
+                art_url = "http://" + self.yam.get_ip_address() + url
+                if art_url != self.last_art_url:
+                    self.update_album_art(art_url)
+
+
+        # timer to sync state so that other conterollers - remotes, spotify, etc. can be tolerated
+        self.playback_timer = qtc.QTimer()
+        self.playback_timer.timeout.connect(self.show_playback)
+        self.playback_timer.start(500)  
+
+
+    def update_album_art(self, art_url: str):
+        if len(art_url):
+            self.last_art_url = art_url
+            # print(art_url)
+            data = urllib.request.urlopen(art_url).read()
+            image = qtg.QImage()
+            image.loadFromData(data)
+            art_width=self.album_art_label.width()
+            scaled_image = image.scaledToWidth(art_width, qtc.Qt.TransformationMode.SmoothTransformation)
+            self.album_art_label.setPixmap(qtg.QPixmap(scaled_image))
+    
+
+    def update_song_album_artist(self, song: str, album: str, artist: str):
+        if len(song) > 37:
+            song = song[:35] +'...'       
+        self.playback_song_label.setText(song)
+
+        if len(album) > 36:
+            album = album[:34] +'...'
+        self.playback_album_label.setText(album)
+            
+        self.playback_artist_label.setText(artist)
+
 
 
     def mousePressEvent(self, event):

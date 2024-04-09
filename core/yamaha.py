@@ -25,6 +25,8 @@ class YamahaAmp():
         else:
             return self.device_info
         
+    def get_ip_address(self):
+        return self.ip_address    
 
     def get_features(self):
         if not self.got_features:

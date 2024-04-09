@@ -49,8 +49,8 @@ class QTRightToolBar(qtw.QToolBar):
             unit_d['label'] = l = yamstyle.styled_label(self.q_main_window,nn,12)
             self.addWidget(l)
             self.unit_list.append(unit_d)
-            print(f"Added Yamaha {mn} ({nn}).")
-            # self.add_toolbar_spacer()
+            
+        self.add_toolbar_spacer()
         # layout the buttons in the toolbar    
         self.add_unit_display() 
         self.select_button("amp","unit-00")
@@ -76,7 +76,7 @@ class QTRightToolBar(qtw.QToolBar):
     
 
     def add_normal_toolbar_button(self,group_name,item_name,icon_file):
-        print(f"Adding '{group_name}'::'{item_name}'")
+        # print(f"Adding '{group_name}'::'{item_name}'")
         i = self.normal_icon(self.icon_path + icon_file)
         a = qtg.QAction(i, item_name.title(), self)
         a.triggered.connect(lambda : self.toolbar_callback(group_name,item_name))

@@ -1,7 +1,7 @@
 #
-#  ROS Home Qt UI
+#   QtYam UI
 #
-# Copyright 2022 Matthew Grund
+# Copyright 2024 Matthew Grund
 #
 # Licensed under the BSD 2 Clause license;
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import PySide6.QtWidgets as qtw
 import PySide6.QtCore as qtc
 import PySide6.QtGui as qtg
 
+import widgets.amp_frames as amp_frames
 
 def configure(qt_main_window):
     # every stacked frame in the central widget
@@ -45,6 +46,7 @@ def setup(qt_main_window):
             qt_main_window.stacked_frame_indices[group][item] = index
             index += 1
             namespace = globals()
+            print(namespace)
             module_name = group + "_frames"
             if module_name in namespace:
                 method_name = "create_" + group + "_" + item + "_frame"

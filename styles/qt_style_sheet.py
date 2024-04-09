@@ -24,6 +24,12 @@ QLabel#UNIT {
     color: #e8904d ;
 }
 
+QSizeGrip {
+    background-color: #212121 ; 
+    color: #e8904d ;
+}
+
+
 #menu_clock {
     background-color: black ; 
     color: white ;
@@ -33,6 +39,7 @@ QLabel#UNIT {
     color: white ;
     padding: 8px 8px ;  
 }
+
 QStatusBar { 
     background-color: #212121 ; 
     color: #e8904d ;

@@ -120,7 +120,7 @@ class QTLeftToolBar(qtw.QToolBar):
         else:
             self.select_button(group_name, item_name)
             self.q_main_window.statusBar().showMessage(group_name.capitalize() + " " + item_name.lower() + " selected", 3000)
-            self.q_main_window.stacked_layout.setCurrentIndex(self.q_main_window.stacked_frame_indices[group_name][item_name]) 
+            self.q_main_window.set_central_frame(group_name,item_name)
 
 
     def control_callback(self, group_name, item_name):    
