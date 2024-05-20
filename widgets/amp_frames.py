@@ -25,28 +25,33 @@ def create_amp_playback_frame(parent: qtc.QObject):
     frame.setAccessibleName(frame_name)
     frame.setFrameStyle(parent.frame_style)
     h_layout = qtw.QHBoxLayout(parent)
-    parent.album_art_label = styled.styled_label(parent,"album art",18)
+    h_layout.setObjectName("amp playback fral HBox layout")
+    parent.album_art_label = styled.styled_label(parent,"album_art",18)
     h_layout.addWidget(parent.album_art_label)
     rh_layout = qtw.QVBoxLayout(parent)
+    rh_layout.setObjectName("amp playback rh vbox")
     title = styled.styled_label(parent,"playback",20)
     title.setAlignment(qtc.Qt.AlignmentFlag.AlignLeft | qtc.Qt.AlignmentFlag.AlignVCenter)
     title.setText(nick_name)
     rh_layout.addWidget(title)
-    
-    spacer_1 = styled.styled_frame(parent,"spacer 1")
-    rh_layout.addWidget(spacer_1)
 
-    parent.playback_song_label = styled.styled_label(parent,"<song>",22)
+    spacer_1 = styled.styled_frame(parent,"spacer1")
+    rh_layout.addWidget(spacer_1)
+ 
+    parent.playback_song_label = styled.styled_label(parent,"song",24)
     parent.playback_song_label.setAlignment(qtc.Qt.AlignmentFlag.AlignLeft | qtc.Qt.AlignmentFlag.AlignVCenter)
     rh_layout.addWidget(parent.playback_song_label)
 
-    parent.playback_album_label = styled.styled_label(parent,"<album>",20)
+    parent.playback_artist_label = styled.styled_label(parent,"artist",20)
+    parent.playback_artist_label.setAlignment(qtc.Qt.AlignmentFlag.AlignLeft | qtc.Qt.AlignmentFlag.AlignVCenter)
+    rh_layout.addWidget(parent.playback_artist_label)
+
+    parent.playback_album_label = styled.styled_label(parent,"album",18)
     parent.playback_album_label.setAlignment(qtc.Qt.AlignmentFlag.AlignLeft | qtc.Qt.AlignmentFlag.AlignVCenter)
     rh_layout.addWidget(parent.playback_album_label)
 
-    parent.playback_artist_label = styled.styled_label(parent,"<artist>",20)
-    parent.playback_artist_label.setAlignment(qtc.Qt.AlignmentFlag.AlignLeft | qtc.Qt.AlignmentFlag.AlignVCenter)
-    rh_layout.addWidget(parent.playback_artist_label)
+    spacer_2 = styled.styled_frame(parent,"spacer2")
+    rh_layout.addWidget(spacer_2)
     h_layout.addLayout(rh_layout)
     frame.setLayout(h_layout)
     return frame

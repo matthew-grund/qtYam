@@ -20,6 +20,7 @@ class QTRightToolBar(qtw.QToolBar):
         self.q_main_window = q_main_window
         self.setStyleSheet(self.q_main_window.styleSheet())
         self.setIconSize(qtc.QSize(48,48))
+        self.setObjectName("Right Toolbar")
         self.setMinimumWidth(96)
         self.setMovable(False)
         self.icon_path = "./icons/"

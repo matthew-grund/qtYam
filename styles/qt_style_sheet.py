@@ -24,20 +24,15 @@ QLabel#UNIT {
     color: #e8904d ;
 }
 
+QLabel#album_art {
+    background-color: black ; 
+    color: black ;
+    border: 0px ;
+}
+
 QSizeGrip {
     background-color: #212121 ; 
     color: #e8904d ;
-}
-
-
-#menu_clock {
-    background-color: black ; 
-    color: white ;
-    padding: 3px 3px ;                
-}
-#big_clock {
-    color: white ;
-    padding: 8px 8px ;  
 }
 
 QStatusBar { 

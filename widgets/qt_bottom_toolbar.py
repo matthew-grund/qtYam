@@ -5,6 +5,7 @@
 # Licensed under the BSD 2 Clause license;
 # you may not use this file except in compliance with the License.
 #
+import sys
 
 import PySide6.QtWidgets as qtw
 import PySide6.QtCore as qtc
@@ -17,15 +18,17 @@ class QTBottomToolBar(qtw.QToolBar):
     def __init__(self, q_main_window):
         super().__init__(q_main_window)
         self.q_main_window = q_main_window
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         self.setStyleSheet(self.q_main_window.styleSheet())
         self.setIconSize(qtc.QSize(42,42))
         self.setMinimumHeight(56)
         self.setMovable(False)
+        self.setObjectName("Bottom Toolbar")
         self.icon_path = "./icons/"
         q_main_window.addToolBar(qtc.Qt.BottomToolBarArea,self)
         self.current_active_button_group = "amp"
         self.current_active_button_item = "playback"
-        self.active_button_color = "white"
+        self.active_button_color = "#e8904d"
         self.normal_button_color = "#777770"
         self.action_dict = {}
         self.playback_is_paused = False
@@ -54,17 +57,20 @@ class QTBottomToolBar(qtw.QToolBar):
 
 
     def add_toolbar_spacer(self):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         spacer = yamstyle.styled_spacer(self.q_main_window)
         self.addWidget(spacer)
 
 
     def add_input_display(self):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         self.input_display = yamstyle.styled_label(self.q_main_window,"Input",18)
         self.input_display.setFixedWidth(128)
         self.addWidget(self.input_display)
     
 
     def add_normal_toolbar_button(self,group_name,item_name,icon_file):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         i = self.normal_icon(self.icon_path + icon_file)
         a = qtg.QAction(i, item_name.title(), self)
         a.triggered.connect(lambda : self.toolbar_callback(group_name,item_name))
@@ -75,6 +81,7 @@ class QTBottomToolBar(qtw.QToolBar):
 
 
     def add_active_toolbar_button(self,group_name,item_name,icon_file):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         i = self.active_icon(self.icon_path + icon_file)
         a = qtg.QAction(i, item_name.title(), self)
         a.triggered.connect(lambda : self.toolbar_callback(group_name,item_name))
@@ -85,6 +92,7 @@ class QTBottomToolBar(qtw.QToolBar):
 
 
     def colorize_button(self, group_name, item_name, color):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         if group_name in self.action_dict:
             if item_name not in self.action_dict[group_name]:
                 return
@@ -101,6 +109,7 @@ class QTBottomToolBar(qtw.QToolBar):
 
         
     def color_icon(self, filename, color):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         pixmap = qtg.QPixmap(filename)
         painter = qtg.QPainter()
         painter.begin(pixmap)
@@ -120,6 +129,7 @@ class QTBottomToolBar(qtw.QToolBar):
 
     
     def toolbar_callback(self, group_name, item_name): 
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         if group_name == 'playback':
             self.control_callback(group_name, item_name) 
         else:
@@ -129,15 +139,17 @@ class QTBottomToolBar(qtw.QToolBar):
 
 
     def control_callback(self, group_name, item_name):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         if group_name == "playback" and item_name == "play":
                 self.q_main_window.yam.set_play(self.playback_is_paused)
                 self.playback_is_paused = not self.playback_is_paused
                 self.show_paused(self.playback_is_paused)
         if group_name == "playback" and item_name == "next":    
-                self.q_main_window.yam.set_skip(True)   
+                self.q_main_window.yam.set_skip(True)
+                self.q_main_window.statusBar().showMessage(f"Skip forward",700)   
         if group_name == "playback" and item_name == "previous":    
                 self.q_main_window.yam.set_skip(False)    
-
+                self.q_main_window.statusBar().showMessage(f"Skip backward",700)   
 
     def select_button(self, group_name, item_name):
         self.colorize_button(self.current_active_button_group, self.current_active_button_item, self.normal_button_color)
@@ -147,6 +159,7 @@ class QTBottomToolBar(qtw.QToolBar):
 
 
     def show_input(self, input: str):
+        self.q_main_window.debug(sys._getframe().f_code.co_name)
         self.input_display.setText(input)
 
 
@@ -154,5 +167,7 @@ class QTBottomToolBar(qtw.QToolBar):
         self.playback_is_paused = is_paused
         if is_paused:
             self.colorize_button("playback","play",self.normal_button_color)
+            self.q_main_window.statusBar().showMessage("Pause",1300)
         else:
             self.colorize_button("playback","play",self.active_button_color)
+            self.q_main_window.statusBar().showMessage("Play",1300)

@@ -6,7 +6,7 @@
 # Licensed under the BSD 2 Clause license;
 # you may not use this file except in compliance with the License.
 #
-
+import sys
 
 import PySide6.QtWidgets as qtw
 import PySide6.QtCore as qtc
@@ -15,6 +15,7 @@ import PySide6.QtGui as qtg
 import widgets.amp_frames as amp_frames
 
 def configure(qt_main_window):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name)
     # every stacked frame in the central widget
     qt_main_window.stacked_frame_dict = {}   # a dict of lists of frames. item [0] of each frame list is attached to the tool bar button
     # map menu
@@ -35,6 +36,7 @@ def configure(qt_main_window):
 
 
 def setup(qt_main_window):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name)
     index = 0
     qt_main_window.central_widget = qtw.QWidget()
     qt_main_window.stacked_layout = qtw.QStackedLayout()
@@ -46,7 +48,7 @@ def setup(qt_main_window):
             qt_main_window.stacked_frame_indices[group][item] = index
             index += 1
             namespace = globals()
-            print(namespace)
+            # print(namespace)
             module_name = group + "_frames"
             if module_name in namespace:
                 method_name = "create_" + group + "_" + item + "_frame"
@@ -56,6 +58,7 @@ def setup(qt_main_window):
                     frame = create(qt_main_window)
                 else:    
                     frame = placeholder_frame(qt_main_window,group,item)
+                    frame.setObjectName(f"Placeholder {group} {item} frame")
             else:
                 frame = placeholder_frame(qt_main_window,group,item)
             qt_main_window.stacked_layout.addWidget(frame)
@@ -64,6 +67,7 @@ def setup(qt_main_window):
 
 
 def placeholder_frame(qt_main_window,group,item):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name)
     frame = qtw.QFrame()
     frame_name = group + "_" + item + "_frame"
     nick_name = f"{group.capitalize()} {item.capitalize()} Frame"
@@ -78,7 +82,8 @@ def placeholder_frame(qt_main_window,group,item):
     return frame
 
 
-def styled_label(qt_main_window,fontsize): 
+def styled_label(qt_main_window,fontsize):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name) 
     styled_label = qtw.QLabel()
     font = styled_label.font()
     font.setPointSize(fontsize)
@@ -89,6 +94,7 @@ def styled_label(qt_main_window,fontsize):
         
         
 def next_page(qt_main_window):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name)
     count = qt_main_window.stacked_layout.count()
     current = qt_main_window.stacked_layout.currentIndex()   
     current += 1
@@ -97,6 +103,7 @@ def next_page(qt_main_window):
     qt_main_window.stacked_layout.setCurrentIndex(current)  
     
 def prev_page(qt_main_window):
+    qt_main_window.debug("central_widget " + sys._getframe().f_code.co_name)
     count = qt_main_window.stacked_layout.count()
     current = qt_main_window.stacked_layout.currentIndex()   
     current -= 1
